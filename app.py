@@ -1,3 +1,26 @@
+import streamlit as st
+
+st.set_page_config(
+    page_title="Hello from Shreya",
+    page_icon="🌷"
+)
+
+# Remember the visitor's name and page during their visit.
+if "visitor_name" not in st.session_state:
+    st.session_state.visitor_name = ""
+
+if "page" not in st.session_state:
+    st.session_state.page = "Welcome"
+
+
+def save_name():
+    st.session_state.visitor_name = st.session_state.name_input
+
+
+def change_page(destination):
+    st.session_state.page = destination
+
+
 descriptions = {
     "January": (
         "You like having something meaningful to work toward, even when "
@@ -148,3 +171,106 @@ descriptions = {
         "as the next big adventure."
     ),
 }
+
+# Sidebar navigation
+page = st.sidebar.radio(
+    "Explore ✨",
+    ["Welcome", "Your Birth Month", "A Note for You"],
+    key="page"
+)
+
+st.sidebar.caption("Made with ❤️ by Shreya")
+
+# PAGE 1: Welcome
+if page == "Welcome":
+    st.title("Hey there! 👋")
+    st.write(
+        "A little hello, a little discovery, "
+        "and something to make you smile."
+    )
+
+    if "name_input" not in st.session_state:
+        st.session_state.name_input = st.session_state.visitor_name
+
+    st.text_input(
+        "What should I call you?",
+        key="name_input",
+        on_change=save_name,
+        placeholder="Type your name and press Enter"
+    )
+
+    name = st.session_state.visitor_name.strip()
+
+    if name:
+        st.success(f"Hello, {name}! So glad you're here 😊")
+        st.button(
+            "Next →",
+            on_click=change_page,
+            args=("Your Birth Month",)
+        )
+
+# PAGE 2: Birth month
+elif page == "Your Birth Month":
+    st.title("Your Birth Month ✨")
+    st.caption(
+        "Just for fun—your birth month doesn't determine "
+        "your personality."
+    )
+
+    month = st.selectbox(
+        "Pick your birth month",
+        ["Choose a month…"] + list(descriptions)
+    )
+
+    if month in descriptions:
+        name = st.session_state.visitor_name.strip()
+
+        if name:
+            st.subheader(f"{name}, your {month} reading 🌸")
+        else:
+            st.subheader(f"{month} 🌸")
+
+        st.write(descriptions[month])
+
+        st.button(
+            "Next → A note for you",
+            on_click=change_page,
+            args=("A Note for You",)
+        )
+
+    st.button(
+        "← Back to welcome",
+        on_click=change_page,
+        args=("Welcome",)
+    )
+
+# PAGE 3: Encouragement
+elif page == "A Note for You":
+    st.title("A Little Note for You 💌")
+
+    name = st.session_state.visitor_name.strip()
+    st.subheader(f"Dear {name}," if name else "Dear you,")
+
+    st.write(
+        "You don't need to figure everything out today. "
+        "Take one small step, give yourself room to learn, "
+        "and notice the things you're already doing well."
+    )
+
+    st.write(
+        "Some days will feel exciting; others will feel ordinary. "
+        "There's room for both. I hope you find one little "
+        "reason to smile today."
+    )
+
+    st.write("With love,")
+    st.write("**Shreya 🌷**")
+
+    if st.button("A little celebration 🎈"):
+        st.balloons()
+
+    st.button(
+        "← Back to birth month",
+        on_click=change_page,
+        args=("Your Birth Month",)
+    )
